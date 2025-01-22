@@ -13,12 +13,17 @@ CS 5330 OpenCV tutorial
 #include "DA2Network.hpp"
 
 
+// Filter to apply simple gray filter
+// Press 'g' to change video to gray scale
 cv::Mat gray1_filter(cv::Mat &frame){
     cv::Mat gray;
     cv::cvtColor(frame, gray, cv::COLOR_BGR2GRAY);
     return gray;
 }
 
+
+// Filter to apply another version of gray filter
+// Press 'h' to change video to another gray scale
 cv::Mat gray2_filter(cv::Mat &frame){
     cv::Mat dst;
 
@@ -36,6 +41,9 @@ cv::Mat gray2_filter(cv::Mat &frame){
     return dst;
 }
 
+
+// Filter to apply sepia filter
+// Press 'a' to change video to sepia tone
 cv::Mat sepia_filter(cv::Mat &frame){
 
     cv::Mat dst;
@@ -57,6 +65,9 @@ cv::Mat sepia_filter(cv::Mat &frame){
     return dst;
 }
 
+
+// Filter to apply gaussian blur with 5x5 kernel
+// Press 'b' to blur the video - Would not work as separable filters implementation is used.
 int blur5x5_1(cv::Mat &src, cv::Mat &dst){
     // Gaussian 5x5 kernel (integer approximation)
     int kernel[5][5] = {
@@ -101,6 +112,9 @@ int blur5x5_1(cv::Mat &src, cv::Mat &dst){
     return 0;
 }
 
+
+// Filter to apply gaussian blur with separable kernels
+// Press 'b' to blur the video
 int blur5x5_2( cv::Mat &src, cv::Mat &dst ){
     // separable filter
     int kernel[5] = {1, 2, 4, 2, 1};
@@ -147,6 +161,8 @@ int blur5x5_2( cv::Mat &src, cv::Mat &dst ){
 }
 
 
+// Sobel filter for X direction
+// Press 'x' to get the sobel filter applied frame
 int sobelX3x3( cv::Mat &src, cv::Mat &dst ){
     // separable filter
     int horizontal[3] = {-1, 0, 1};
@@ -193,6 +209,8 @@ int sobelX3x3( cv::Mat &src, cv::Mat &dst ){
 }
 
 
+// Sobel filter for Y direction
+// Press 'y' to get the sobel filter applied frame
 int sobelY3x3( cv::Mat &src, cv::Mat &dst ) {
     // Separable filter
     int horizontal[3] = {1, 2, 1};
@@ -240,6 +258,9 @@ int sobelY3x3( cv::Mat &src, cv::Mat &dst ) {
     return 0;
 }
 
+
+// Magnitude of the sobel output
+// Press 'm' to get the magnitude computed frame
 int magnitude(cv::Mat &sx, cv::Mat &sy, cv::Mat &dst) {
 
     dst = cv::Mat::zeros(sx.size(), CV_8UC3);
@@ -265,6 +286,8 @@ int magnitude(cv::Mat &sx, cv::Mat &sy, cv::Mat &dst) {
 }
 
 
+// Blur and quantize the image
+// Press 'l' to get the quantized frame
 int blurQuantize( cv::Mat &src, cv::Mat &dst, int levels ){
     
     // Blur the image
@@ -292,6 +315,8 @@ int blurQuantize( cv::Mat &src, cv::Mat &dst, int levels ){
 }
 
 
+// Filter to get the face box
+// Press 'f' to get the face box for the video
 cv::Mat get_face_box(cv::Mat &frame){
     //detect faces
     cv::Mat grey;
@@ -318,6 +343,7 @@ cv::Mat get_face_box(cv::Mat &frame){
 }
 
 
+// Function to get the depth information
 cv::Mat get_depth(float scale_factor, cv::Mat &src){
     cv::Mat dst;
 
@@ -334,6 +360,8 @@ cv::Mat get_depth(float scale_factor, cv::Mat &src){
 }
 
 
+// Function to apply background blur
+// Press 'd' to get the frame with background blur effect
 cv::Mat background_blur(cv::Mat &frame, float scale_factor){
     cv::Mat dst = get_depth(scale_factor, frame);
 
@@ -368,7 +396,8 @@ cv::Mat background_blur(cv::Mat &frame, float scale_factor){
 
 // ADDITIONAL TASKS
 
-// Mirror the video - p key (filter effect)
+// Filter to apply mirror effect
+// Press 'u' to get the mirrored video
 int mirror_filter(cv::Mat &src, cv::Mat &dst){
 
     cv::Mat temp;
@@ -387,8 +416,35 @@ int mirror_filter(cv::Mat &src, cv::Mat &dst){
 }
 
 
+// Filter to apply median filter
+// Press 'i' to get the video with median filter
+int medianFilter5x5(cv::Mat &frame, cv::Mat &dst){
+    cv::Mat padded_frame;
+    cv::copyMakeBorder(frame, padded_frame, 2, 2, 2, 2, cv::BORDER_REFLECT);
 
-// Fog effect - o key
+    frame.copyTo(dst);
+
+    for (int i=2; i<frame.rows-2; i++){
+        for(int j=2; j<frame.cols-2; j++){
+            for (int c=0; c<3; c++){
+                int pixels[25] = {
+                    padded_frame.at<cv::Vec3b>(i-2, j-2)[c], padded_frame.at<cv::Vec3b>(i-2, j-1)[c], padded_frame.at<cv::Vec3b>(i-2, j)[c], padded_frame.at<cv::Vec3b>(i-2, j+1)[c], padded_frame.at<cv::Vec3b>(i-2, j+2)[c],
+                    padded_frame.at<cv::Vec3b>(i-1, j-2)[c], padded_frame.at<cv::Vec3b>(i-1, j-1)[c], padded_frame.at<cv::Vec3b>(i-1, j)[c], padded_frame.at<cv::Vec3b>(i-1, j+1)[c], padded_frame.at<cv::Vec3b>(i-1, j+2)[c],
+                    padded_frame.at<cv::Vec3b>(i, j-2)[c], padded_frame.at<cv::Vec3b>(i, j-1)[c], padded_frame.at<cv::Vec3b>(i, j)[c], padded_frame.at<cv::Vec3b>(i, j+1)[c], padded_frame.at<cv::Vec3b>(i, j+2)[c],
+                    padded_frame.at<cv::Vec3b>(i+1, j-2)[c], padded_frame.at<cv::Vec3b>(i+1, j-1)[c], padded_frame.at<cv::Vec3b>(i+1, j)[c], padded_frame.at<cv::Vec3b>(i+1, j+1)[c], padded_frame.at<cv::Vec3b>(i+1, j+2)[c],
+                    padded_frame.at<cv::Vec3b>(i+2, j-2)[c], padded_frame.at<cv::Vec3b>(i+2, j-1)[c], padded_frame.at<cv::Vec3b>(i+2, j)[c], padded_frame.at<cv::Vec3b>(i+2, j+1)[c], padded_frame.at<cv::Vec3b>(i+2, j+2)[c]
+                };
+                std::sort(pixels, pixels+25);
+                dst.at<cv::Vec3b>(i-2, j-2)[c] = pixels[12];
+            }
+        }
+    }
+    return 0;
+}
+
+
+// Filter to apply fog effect
+// Press 'o' to get the frame with fog effect
 cv::Mat background_fog(cv::Mat &frame, float scale_factor){
 
     cv::Mat dst = get_depth(scale_factor, frame);
@@ -396,7 +452,7 @@ cv::Mat background_fog(cv::Mat &frame, float scale_factor){
 
     // Ensure depth is normalized to [0, 1]
     cv::Mat normalized_depth;
-    dst.convertTo(dst, CV_32FC1); // Convert to float if not already
+    dst.convertTo(dst, CV_32FC1); // Convert to float
 
     cv::normalize(dst, normalized_depth, 0, 1, cv::NORM_MINMAX);
 
@@ -408,9 +464,8 @@ cv::Mat background_fog(cv::Mat &frame, float scale_factor){
         for (int j = 0; j < frame.cols; j++) {
 
             // Get inverted depth value, to make farther objects appear foggy
-            //float depth_value = 1 - normalized_depth.at<float>(i, j);
             float depth_value = 1 - normalized_depth.at<float>(i, j);
-            //depth_value = std::exp(-depth_value * 1.0f); // Exponential decay
+            //depth_value = std::exp(-depth_value * 1.0f); // Exponential decay, this is not working as intended for me, not sure why
 
             // Blend the fog color with the original pixel color
             result.at<cv::Vec3b>(i, j)[0] = (1 - depth_value) * result.at<cv::Vec3b>(i, j)[0] + depth_value * fog_color[0];
@@ -422,16 +477,13 @@ cv::Mat background_fog(cv::Mat &frame, float scale_factor){
 }
 
 
+// Tried something different
+// Filter to apply a sketch type effect (Atleast that was the goal)
+// Press 'p' to get the frame with sketch effect
+cv::Mat sketch_filter(cv::Mat &frame){
 
-
-//  Just Experimenting 
-
-
-int special_effect(cv::Mat &frame){
-    cv::Mat dst1;
-    cv::GaussianBlur(frame, dst1, cv::Size(5, 5), 0);
-    // cv::GaussianBlur(frame, dst1, cv::Size(5, 5), 0);
-    // frame.copyTo(dst1);
+    cv::Mat temp1;
+    cv::bilateralFilter(frame, temp1, 7, 100, 100);
 
     cv::Mat sx;
     sobelX3x3(frame, sx);
@@ -439,38 +491,36 @@ int special_effect(cv::Mat &frame){
     cv::Mat sy;
     sobelY3x3(frame, sy);
 
-    cv::Mat dst2;
-    magnitude(sx, sy, dst2);
+    cv::Mat temp2;
+    magnitude(sx, sy, temp2);
 
-    cv::cvtColor(dst2, dst2, cv::COLOR_BGR2GRAY);
-    for(int i=0; i<dst2.rows; i++){
-        for(int j=0; j<dst2.cols; j++){
-            if(dst2.at<uchar>(i, j) <= 50){
-                dst2.at<uchar>(i, j) = 255;
+    cv::cvtColor(temp2, temp2, cv::COLOR_BGR2GRAY);
+    for(int i=0; i<temp2.rows; i++){
+        for(int j=0; j<temp2.cols; j++){
+            if(temp2.at<uchar>(i, j) <= 50){
+                temp2.at<uchar>(i, j) = 255;
             }
             else{
-                dst2.at<uchar>(i, j) = 0;
+                temp2.at<uchar>(i, j) = 0;
             }
         }
     }
 
-    cv::medianBlur(dst2, dst2, 5);
-    cv::medianBlur(dst2, dst2, 5);
+    cv::Mat temp3;
+    medianBlur(temp2, temp3, 5);
+    //medianFilter5x5(temp2, temp3);
 
-    cv::Mat temp;
-    dst1.copyTo( temp ); 
+    cv::Mat dst;
+    temp1.copyTo( dst ); 
 
-    for(int i=0; i<dst1.rows; i++){
-        for(int j=0; j<dst1.cols; j++){
-            if(dst2.at<uchar>(i, j) == 0){
-                temp.at<cv::Vec3b>(i, j)[0] = 0;
-                temp.at<cv::Vec3b>(i, j)[1] = 0;
-                temp.at<cv::Vec3b>(i, j)[2] = 0;
+    for(int i=0; i<temp1.rows; i++){
+        for(int j=0; j<temp1.cols; j++){
+            if(temp3.at<uchar>(i, j) == 0){
+                dst.at<cv::Vec3b>(i, j)[0] = 0;
+                dst.at<cv::Vec3b>(i, j)[1] = 0;
+                dst.at<cv::Vec3b>(i, j)[2] = 0;
             }
         }
-    }
-    cv::imshow("d1", dst1);
-    cv::imshow("d2", dst2);
-    cv::imshow("test1", temp); 
-    return 0;
+    } 
+    return dst;
 }

@@ -19,11 +19,14 @@ int sobelX3x3( cv::Mat &src, cv::Mat &dst );
 int sobelY3x3( cv::Mat &src, cv::Mat &dst );
 int magnitude( cv::Mat &sx, cv::Mat &sy, cv::Mat &dst );
 int blurQuantize( cv::Mat &src, cv::Mat &dst, int levels );
-int mirror_filter(cv::Mat &src, cv::Mat &dst);
 cv::Mat get_face_box(cv::Mat &frame);
 cv::Mat get_depth(float scale_factor, cv::Mat &src);
 cv::Mat background_blur(cv::Mat &frame, float scale_factor);
+
+int mirror_filter(cv::Mat &src, cv::Mat &dst);
+int medianFilter5x5(cv::Mat &frame, cv::Mat &dst);
 cv::Mat background_fog(cv::Mat &frame, float scale_factor);
-int special_effect(cv::Mat &frame);
+cv::Mat sketch_filter(cv::Mat &frame);
+
 
 #endif // FILTERS_H
