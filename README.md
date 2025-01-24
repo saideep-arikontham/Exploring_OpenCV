@@ -81,7 +81,9 @@ This project demonstrates various image and video filter techniques using OpenCV
 
 3. Compile the project:
    ```bash
-   make
+   make vidDisplay
+   make imgDisplay
+   make timeBlur    #Only if you want to time your blur implementations
    ```
 
 ---
