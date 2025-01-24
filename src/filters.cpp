@@ -330,7 +330,7 @@ cv::Mat get_face_box(cv::Mat &frame){
     detectFaces( grey, faces );
 
     // draw boxes around the faces
-    drawBoxes( frame, faces );
+    drawBoxes( frame, faces);
 
     // add a little smoothing by averaging the last two detections
     if( faces.size() > 0 ) {
@@ -362,23 +362,20 @@ cv::Mat get_depth(float scale_factor, cv::Mat &src){
 
 // Function to apply background blur
 // Press 'd' to get the frame with background blur effect
-cv::Mat background_blur(cv::Mat &frame, float scale_factor){
+cv::Mat background_blur(cv::Mat &frame, cv::Mat &dst_vis, float scale_factor){
     cv::Mat dst = get_depth(scale_factor, frame);
 
     // depth image
-    cv::Mat dst_vis;
-    cv::applyColorMap(dst, dst_vis, cv::COLORMAP_INFERNO);
-    cv::cvtColor(dst_vis, dst_vis, cv::COLOR_BGR2GRAY); // single channel image, easier to understand how far each pixel is from the camera.
-    cv::imshow("depth", dst_vis);
+    cv::normalize(dst, dst_vis, 0, 255, cv::NORM_MINMAX, CV_8UC1);
 
     // identify if pixel is part of background or not based on threshold
     cv::Mat background_mask;
     cv::threshold(dst_vis, background_mask, 70, 255, cv::THRESH_BINARY); // pixel value above 70 set to 255 (white) and below 70 set to 0 (black)
-    cv::imshow("bgmask", background_mask);
+    // cv::imshow("bgmask", background_mask);
 
     // apply intensive blur (not using 5x5 blur code that I wrote because its less intense)
     cv::Mat blurred_frame;
-    cv::GaussianBlur(frame, blurred_frame, cv::Size(21, 21), 0);
+    cv::GaussianBlur(frame, blurred_frame, cv::Size(27, 27), 0);
 
     cv::Mat result;
     frame.copyTo(result);
@@ -392,6 +389,7 @@ cv::Mat background_blur(cv::Mat &frame, float scale_factor){
     }
     return result;
 }
+
 
 
 // ADDITIONAL TASKS
@@ -443,18 +441,17 @@ int medianFilter5x5(cv::Mat &frame, cv::Mat &dst){
 }
 
 
+
 // Filter to apply fog effect
 // Press 'o' to get the frame with fog effect
-cv::Mat background_fog(cv::Mat &frame, float scale_factor){
+cv::Mat background_fog(cv::Mat &frame, cv::Mat &dst, float scale_factor){
 
-    cv::Mat dst = get_depth(scale_factor, frame);
+    dst = get_depth(scale_factor, frame);
     int fog_color[3] = {179, 179, 242}; 
 
     // Ensure depth is normalized to [0, 1]
     cv::Mat normalized_depth;
-    dst.convertTo(dst, CV_32FC1); // Convert to float
-
-    cv::normalize(dst, normalized_depth, 0, 1, cv::NORM_MINMAX);
+    cv::normalize(dst, normalized_depth, 0, 1, cv::NORM_MINMAX, CV_32FC1);
 
     cv::Mat result;
     frame.copyTo(result);
@@ -464,8 +461,8 @@ cv::Mat background_fog(cv::Mat &frame, float scale_factor){
         for (int j = 0; j < frame.cols; j++) {
 
             // Get inverted depth value, to make farther objects appear foggy
-            float depth_value = 1 - normalized_depth.at<float>(i, j);
-            //depth_value = std::exp(-depth_value * 1.0f); // Exponential decay, this is not working as intended for me, not sure why
+            float depth_value = normalized_depth.at<float>(i, j);
+            depth_value = std::exp(-depth_value * 3.0f); // Exponential decay
 
             // Blend the fog color with the original pixel color
             result.at<cv::Vec3b>(i, j)[0] = (1 - depth_value) * result.at<cv::Vec3b>(i, j)[0] + depth_value * fog_color[0];
@@ -477,13 +474,14 @@ cv::Mat background_fog(cv::Mat &frame, float scale_factor){
 }
 
 
-// Tried something different
+// EXTENTIONS
+
 // Filter to apply a sketch type effect (Atleast that was the goal)
 // Press 'p' to get the frame with sketch effect
 cv::Mat sketch_filter(cv::Mat &frame){
 
     cv::Mat temp1;
-    cv::bilateralFilter(frame, temp1, 7, 100, 100);
+    blurQuantize(frame, temp1, 25);
 
     cv::Mat sx;
     sobelX3x3(frame, sx);
@@ -524,3 +522,20 @@ cv::Mat sketch_filter(cv::Mat &frame){
     } 
     return dst;
 }
+
+
+// Filter to create a passing circle
+
+int passing_circle(cv::Mat &frame){
+    static int x = 0;
+    int y = 360;
+    cv::circle(frame, cv::Point(x%frame.cols, y), 100, cv::Scalar(230, 123, 41), -1);
+    x = x + 10;
+    return 0;
+}
+
+
+
+
+
+

@@ -20,15 +20,15 @@ Filters that directly effect video:
 - Press 'b' to blur the video (separable kernel)
 - Press 'f' to get the face box for the video
 - Press 'u' to get the mirrored video
-
+- Press 'd' to get the portrait image (background blurred)
+- Press 'o' to get the frame with fog effect
+- Press 'k' to get the video with passing circle
 
 Filters that effect the current frame and save the image:
 - Press 'x' to get the sobel filter applied frame
 - Press 'y' to get the sobel filter applied frame
 - Press 'm' to get the magnitude of sobel filter applied frame
 - Press 'l' to get the quantized image
-- Press 'd' to get the portrait image (background blurred)
-- Press 'o' to get the frame with fog effect
 - Press 'p' to get the frame with sketch effect
 - Press 'i' to get the frame with median filter
 
@@ -51,6 +51,10 @@ int main(int argc, char *argv[]) {
         cv::Size refS( (int) capdev->get(cv::CAP_PROP_FRAME_WIDTH ),
                        (int) capdev->get(cv::CAP_PROP_FRAME_HEIGHT));
         printf("Expected size: %d %d\n", refS.width, refS.height);
+
+        const float reduction = 0.6;
+        float scale_factor = 256.0 / (refS.height*reduction);
+        printf("Using scale factor %.2f\n", scale_factor);
 
         cv::namedWindow("Video", 1); // identifies a window
         cv::Mat frame;
@@ -90,6 +94,24 @@ int main(int argc, char *argv[]) {
                 else if(prev_key == 'u'){ // mirror filter
                     cv::Mat dst;
                     mirror_filter(frame, dst);
+                    cv::imshow("Video", dst);
+                }
+                else if(prev_key == 'd'){ // portrait (background blur) filter
+                    cv::resize( frame, frame, cv::Size(), reduction, reduction );
+                    cv::Mat dst_vis;
+                    cv::Mat result = background_blur(frame, dst_vis, scale_factor);
+                    cv::imshow("Video", result);
+                }
+                else if(prev_key == 'o'){ // Fog filter
+                    cv::resize( frame, frame, cv::Size(), reduction, reduction );
+                    cv::Mat dst;
+                    cv::Mat result = background_fog(frame, dst, scale_factor);
+                    cv::imshow("Video", result);
+                }
+                else if(prev_key == 'k'){
+                    cv::Mat dst;
+                    frame.copyTo(dst);
+                    passing_circle(dst);
                     cv::imshow("Video", dst);
                 }
                 else{ // no effect
@@ -140,23 +162,6 @@ int main(int argc, char *argv[]) {
                     cv::imshow("Quantized", dst);
                     cv::imwrite("output/blurQuantize.jpg", dst);
                 }
-                else if(key == 'd'){ // portrait (background blur) filter
-                    const float reduction = 0.5;
-                    float scale_factor = 256.0 / (refS.height*reduction);
-                    printf("Using scale factor %.2f\n", scale_factor);
-                    cv::imwrite("output/portrait_original.jpg", frame);
-                    cv::Mat result = background_blur(frame, scale_factor);
-                    cv::imwrite("output/portrait_image.jpg", result);
-                }
-                else if(key == 'o'){ // Fog filter
-                    const float reduction = 0.5;
-                    float scale_factor = 256.0 / (refS.height*reduction);
-                    printf("Using scale factor %.2f\n", scale_factor);
-                    cv::imwrite("output/fog_original.jpg", frame);
-                    cv::Mat result = background_fog(frame, scale_factor);
-                    cv::imshow("Fog", result);
-                    cv::imwrite("output/fog_image.jpg", result);
-                }
                 else if(key == 'p'){ // sketch filter
                     cv::Mat dst;
                     cv::imwrite("output/sketch_original.jpg", frame);
@@ -174,7 +179,7 @@ int main(int argc, char *argv[]) {
                 // Checking key press/ previous key press for saving images
                 else if ( key == 's' )
                 {
-                    if( prev_key != 'g' && prev_key != 'h' && prev_key != 'a' && prev_key != 'b' && prev_key != 'f' && prev_key != 'u'){
+                    if( prev_key != 'g' && prev_key != 'h' && prev_key != 'a' && prev_key != 'b' && prev_key != 'f' && prev_key != 'u' && prev_key != 'd' && prev_key != 'o' && prev_key != 'k'){
                         cv::imwrite("output/color_image.jpg", frame);
                     }
                     else if( prev_key == 'g' ){ // cvtColor gray scale
@@ -208,9 +213,31 @@ int main(int argc, char *argv[]) {
                         mirror_filter(frame, dst);
                         cv::imwrite("output/mirror_image.jpg", dst);
                     }
+                    else if(prev_key == 'd'){ // portrait (background blur) filter
+                        cv::imwrite("output/portrait_original.jpg", frame);
+                        cv::Mat dst_vis;
+                        cv::Mat result = background_blur(frame, dst_vis, scale_factor);
+                        cv::imwrite("output/portrait_depth.jpg", dst_vis);
+                        cv::imwrite("output/portrait_image.jpg", result);
+                    }
+                    else if(prev_key == 'o'){ // Fog filter
+                        cv::imwrite("output/fog_original.jpg", frame);
+                        cv::Mat dst;
+                        cv::Mat result = background_fog(frame, dst, scale_factor);
+                        cv::normalize(dst, dst, 0, 255, cv::NORM_MINMAX, CV_8UC1);
+                        cv::imwrite("output/fog_depth.jpg", dst);
+                        cv::imwrite("output/fog_image.jpg", result);
+                    }
+                    else if(prev_key == 'k'){ // Passing circle filter
+                    cv::Mat dst;
+                    frame.copyTo(dst);
+                    cv::imwrite("output/passing_circle_original.jpg", frame);
+                    passing_circle(dst);
+                    cv::imwrite("output/passing_circle_image.jpg", dst);
+                }
                 }
                 
-                if ( key == 'g' || key == 'c' || key == 'h' || key == 'a' || key == 'b' || key == 'f' || key == 'u')
+                if ( key == 'g' || key == 'c' || key == 'h' || key == 'a' || key == 'b' || key == 'f' || key == 'u' || key == 'd' || key == 'o' || key=='k')
                     {
                         prev_key = key;
                     }    
