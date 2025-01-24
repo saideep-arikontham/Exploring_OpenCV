@@ -27,7 +27,7 @@ int mirror_filter(cv::Mat &src, cv::Mat &dst);
 int medianFilter5x5(cv::Mat &frame, cv::Mat &dst);
 cv::Mat background_fog(cv::Mat &frame, cv::Mat &dst, float scale_factor);
 cv::Mat sketch_filter(cv::Mat &frame);
-int passing_circle(cv::Mat &frame);
+int bouncing_circle(cv::Mat &frame);
 
 
 #endif // FILTERS_H

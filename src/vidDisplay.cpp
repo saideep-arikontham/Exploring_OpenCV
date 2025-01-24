@@ -22,7 +22,7 @@ Filters that directly effect video:
 - Press 'u' to get the mirrored video
 - Press 'd' to get the portrait image (background blurred)
 - Press 'o' to get the frame with fog effect
-- Press 'k' to get the video with passing circle
+- Press 'k' to get the video with bouncing circle
 
 Filters that effect the current frame and save the image:
 - Press 'x' to get the sobel filter applied frame
@@ -111,7 +111,7 @@ int main(int argc, char *argv[]) {
                 else if(prev_key == 'k'){
                     cv::Mat dst;
                     frame.copyTo(dst);
-                    passing_circle(dst);
+                    bouncing_circle(dst);
                     cv::imshow("Video", dst);
                 }
                 else{ // no effect
@@ -228,12 +228,12 @@ int main(int argc, char *argv[]) {
                         cv::imwrite("output/fog_depth.jpg", dst);
                         cv::imwrite("output/fog_image.jpg", result);
                     }
-                    else if(prev_key == 'k'){ // Passing circle filter
+                    else if(prev_key == 'k'){ // Bouncing circle filter
                     cv::Mat dst;
                     frame.copyTo(dst);
-                    cv::imwrite("output/passing_circle_original.jpg", frame);
-                    passing_circle(dst);
-                    cv::imwrite("output/passing_circle_image.jpg", dst);
+                    cv::imwrite("output/bouncing_circle_original.jpg", frame);
+                    bouncing_circle(dst);
+                    cv::imwrite("output/bouncing_circle_image.jpg", dst);
                 }
                 }
                 

@@ -17,7 +17,7 @@ This project demonstrates various image and video filter techniques using OpenCV
   - Mirror Effect
   - Portrait effect (background blur)
   - Fog effect 
-  - Passing Circle
+  - Bouncing Circle
 
 - **Image Filters (Applied to a single video frame)**:
   - Sobel X filter
@@ -110,7 +110,7 @@ Run the `vidDisplay` program to process video streams with interactive filters o
 - `u`: Mirror effect
 - `d`: Background blur
 - `o`: Background fog
-- `k`: Passing circle effect
+- `k`: Bouncing circle effect
 - `x`: Sobel X filter
 - `y`: Sobel Y filter
 - `m`: Sobel magnitude filter

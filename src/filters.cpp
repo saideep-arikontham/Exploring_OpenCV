@@ -524,18 +524,40 @@ cv::Mat sketch_filter(cv::Mat &frame){
 }
 
 
-// Filter to create a passing circle
+// Filter to create a bouncing circle 
+// Press 'k' to get the video stream with bouncing circle
+int bouncing_circle(cv::Mat &frame) {
+    // defining static variables to keep track of the circle's position in between function calls.
 
-int passing_circle(cv::Mat &frame){
-    static int x = 0;
-    int y = 360;
-    cv::circle(frame, cv::Point(x%frame.cols, y), 100, cv::Scalar(230, 123, 41), -1);
-    x = x + 10;
+    // initial position
+    static int x = frame.cols / 2; 
+    static int y = frame.rows / 2; 
+    // position change
+    static int dx = 10; 
+    static int dy = 10;
+
+    int radius = 100;
+
+    // Update the circle's position
+    x += dx;
+    y += dy;
+
+    // Conditions to keep circle within the frame
+    if (x - radius < 0 || x + radius >= frame.cols) { // taking radius into account will help to keep the circle completely within the window
+        dx = -dx + (std::rand() % 3 - 1) * 2; // change to opposite direction with randomness
+    }
+    if (y - radius < 0 || y + radius >= frame.rows) {
+        dy = -dy + (std::rand() % 3 - 1) * 2;
+    }
+
+    // if dx or dy becomes 0 from the above conditions, then reset the values to 0
+    if (dx == 0)
+        dx = 10;
+    if (dy == 0) 
+        dy = 10;
+
+    // Circle
+    cv::circle(frame, cv::Point(x, y), radius, cv::Scalar(230, 123, 41), -1);
+
     return 0;
 }
-
-
-
-
-
-
