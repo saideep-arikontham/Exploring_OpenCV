@@ -19,7 +19,7 @@ This project demonstrates various image and video filter techniques using OpenCV
   - Fog effect 
   - Passing Circle
 
-- **Image Filters**:
+- **Image Filters (Applied to a single video frame)**:
   - Sobel X filter
   - Sobel Y filter
   - Magnitude
@@ -57,9 +57,9 @@ This project demonstrates various image and video filter techniques using OpenCV
 ---
 
 ## Tools used
-- OS: MacOS
-- C++ Compiler: Apple clang version 16.0.0
-- IDE: Visual Studio code
+- `OS`: MacOS
+- `C++ Compiler`: Apple clang version 16.0.0
+- `IDE`: Visual Studio code
 
 ---
 
@@ -140,6 +140,7 @@ Run the `timeBlur` program to time two different blur implementations:
     - Face detection leverages Haar cascades for identifying faces in real-time video streams.
 
 All these effects are utilized in vidDisplay.cpp.
+
 ---
 
 ## Contact
