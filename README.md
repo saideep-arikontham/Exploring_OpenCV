@@ -1,7 +1,7 @@
 # Exploring OpenCV Filters and Video Processing - Project1
 
 ## Overview
-This project demonstrates various image and video filter techniques using OpenCV. It includes implementations of different filters, face detection, and effects on video streams, providing a comprehensive tutorial for understanding OpenCV's capabilities in computer vision.
+This project demonstrates various image and video filter techniques using OpenCV. It includes implementations of different filters, face detection, and effects on video streams, showcasing my understanding OpenCV's functionalities and capabilities in computer vision.
 
 ---
 
