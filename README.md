@@ -56,6 +56,13 @@ This project demonstrates various image and video filter techniques using OpenCV
 
 ---
 
+## Tools used
+- OS: MacOS
+- C++ Compiler: Apple clang version 16.0.0
+- IDE: Visual Studio code
+
+---
+
 ## Dependencies
 - OpenCV
 - ONNX Runtime
@@ -115,6 +122,8 @@ Run the `vidDisplay` program to process video streams with interactive filters o
 - `s`: Save current frame
 - `q`: Quit
 
+More information about the internal implementation along with outputs of each of the above filters is included in **Project1_Report.pdf**
+
 ### 3. Time Blur
 Run the `timeBlur` program to time two different blur implementations:
 ```bash
@@ -134,9 +143,5 @@ All these effects are utilized in vidDisplay.cpp.
 ---
 
 ## Contact
-For any questions or support, please reach out to:
 - **Name**: Saideep Arikontham
 - **Email**: arikontham.s@northeastern,edu
-```
-
-Let me know if further adjustments are required!
